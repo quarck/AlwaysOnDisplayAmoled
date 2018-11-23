@@ -39,7 +39,7 @@ import com.tomer.alwayson.services.MainService;
 import com.tomer.alwayson.services.StarterService;
 
 import eu.chainfire.libsuperuser.Shell;
-import fr.nicolaspomepuy.discreetapprate.AppRate;
+//import fr.nicolaspomepuy.discreetapprate.AppRate;
 
 public class PreferencesActivity extends AppCompatActivity implements ColorChooserDialog.ColorCallback, ContextConstatns {
     private boolean isActive;
@@ -113,19 +113,19 @@ public class PreferencesActivity extends AppCompatActivity implements ColorChoos
     }
 
     private void appRate() {
-        AppRate.with(this).starRating(true).setOnRateListener(new AppRate.OnStarRateListener() {
-            @Override
-            public void onPositiveRating(int starRating) {
-                SettingsFragment.openPlayStoreUrl("com.tomer.alwayson", PreferencesActivity.this);
-                Toast.makeText(PreferencesActivity.this, R.string.toast_thanks_rate, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onNegativeRating(int starRating, AppRate appRate) {
-                Toast.makeText(PreferencesActivity.this, R.string.toast_thanks, Toast.LENGTH_LONG).show();
-                appRate.hide();
-            }
-        }).checkAndShow();
+//        AppRate.with(this).starRating(true).setOnRateListener(new AppRate.OnStarRateListener() {
+//            @Override
+//            public void onPositiveRating(int starRating) {
+//                SettingsFragment.openPlayStoreUrl("com.tomer.alwayson", PreferencesActivity.this);
+//                Toast.makeText(PreferencesActivity.this, R.string.toast_thanks_rate, Toast.LENGTH_LONG).show();
+//            }
+//
+//            @Override
+//            public void onNegativeRating(int starRating, AppRate appRate) {
+//                Toast.makeText(PreferencesActivity.this, R.string.toast_thanks, Toast.LENGTH_LONG).show();
+//                appRate.hide();
+//            }
+//        }).checkAndShow();
     }
 
     private void donateButtonSetup() {

@@ -46,21 +46,11 @@ public class Intro extends AppIntro2 {
         pref = new Prefs(getApplicationContext());
         pref.apply();
 
-        if (Utils.isAndroidNewerThanM()) {
-            boolean isPhone;
-            isPhone = Utils.isPhone(context);
-            permissions = new boolean[isPhone ? 3 : 2];
-            skipButtonEnabled = false;
-            addSlide(new First());
-            addSlide(new Second());
-            if (isPhone)
-                addSlide(new Third());
-        } else {
-            skipButtonEnabled = true;
-        }
-
+        permissions = new boolean[3];
+        skipButtonEnabled = false;
+        addSlide(new First());
+        addSlide(new Third());
         addSlide(new Fourth());
-        addSlide(new Fifth());
 
         setNextPageSwipeLock(true);
         setProgressButtonEnabled(true);
@@ -159,55 +149,55 @@ public class Intro extends AppIntro2 {
         }
     }
 
-    public static class Second extends Fragment {
-        private Button go;
-        private View v;
-
-        @TargetApi(Build.VERSION_CODES.M)
-        @Override
-        public void onResume() {
-            super.onResume();
-            if (!Settings.System.canWrite(context)) {
-                permissions[1] = false;
-                go.setTextColor(ContextCompat.getColor(context, android.R.color.black));
-                go.setText(getString(R.string.intro_allow_now));
-                go.setEnabled(true);
-                v.findViewById(R.id.go).setOnClickListener(v1 -> {
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + context.getPackageName()));
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                });
-            } else {
-                permissions[1] = true;
-                Button go = (Button) v.findViewById(R.id.go);
-                go.setVisibility(View.INVISIBLE);
-            }
-        }
-
-        @TargetApi(Build.VERSION_CODES.M)
-        @Nullable
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            v = inflater.inflate(R.layout.intro_screen, container, false);
-            v.findViewById(R.id.background).setBackgroundColor(Color.parseColor("#795548"));
-            ((TextView) v.findViewById(R.id.title)).setText(R.string.intro_modify);
-            ((TextView) v.findViewById(R.id.description)).setText(R.string.intro_modify_desc);
-            go = (Button) v.findViewById(R.id.go);
-            if (!Settings.System.canWrite(context)) {
-                permissions[1] = false;
-                v.findViewById(R.id.go).setOnClickListener(v1 -> {
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + context.getPackageName()));
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                });
-            } else {
-                permissions[1] = true;
-                go.setVisibility(View.INVISIBLE);
-            }
-
-            return v;
-        }
-    }
+//    public static class Second extends Fragment {
+//        private Button go;
+//        private View v;
+//
+//        @TargetApi(Build.VERSION_CODES.M)
+//        @Override
+//        public void onResume() {
+//            super.onResume();
+//            if (!Settings.System.canWrite(context)) {
+//                permissions[1] = false;
+//                go.setTextColor(ContextCompat.getColor(context, android.R.color.black));
+//                go.setText(getString(R.string.intro_allow_now));
+//                go.setEnabled(true);
+//                v.findViewById(R.id.go).setOnClickListener(v1 -> {
+//                    Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + context.getPackageName()));
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    startActivity(intent);
+//                });
+//            } else {
+//                permissions[1] = true;
+//                Button go = (Button) v.findViewById(R.id.go);
+//                go.setVisibility(View.INVISIBLE);
+//            }
+//        }
+//
+//        @TargetApi(Build.VERSION_CODES.M)
+//        @Nullable
+//        @Override
+//        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//            v = inflater.inflate(R.layout.intro_screen, container, false);
+//            v.findViewById(R.id.background).setBackgroundColor(Color.parseColor("#795548"));
+//            ((TextView) v.findViewById(R.id.title)).setText(R.string.intro_modify);
+//            ((TextView) v.findViewById(R.id.description)).setText(R.string.intro_modify_desc);
+//            go = (Button) v.findViewById(R.id.go);
+//            if (!Settings.System.canWrite(context)) {
+//                permissions[1] = false;
+//                v.findViewById(R.id.go).setOnClickListener(v1 -> {
+//                    Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + context.getPackageName()));
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    startActivity(intent);
+//                });
+//            } else {
+//                permissions[1] = true;
+//                go.setVisibility(View.INVISIBLE);
+//            }
+//
+//            return v;
+//        }
+//    }
 
     public static class Third extends Fragment {
         private View v;
@@ -280,62 +270,62 @@ public class Intro extends AppIntro2 {
         }
     }
 
-    public static class Fifth extends Fragment {
-        private View v;
-        private boolean shouldEnableNotificationsAlerts;
-        private Button go;
-
-        @Nullable
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            v = inflater.inflate(R.layout.intro_screen, container, false);
-            v.findViewById(R.id.background).setBackgroundColor(Color.parseColor("#9c27b0"));
-            ((TextView) v.findViewById(R.id.title)).setText(R.string.intro_notifications);
-            ((TextView) v.findViewById(R.id.description)).setText(R.string.intro_notifications_desc);
-            go = (Button) v.findViewById(R.id.go);
-            go.setOnClickListener(view -> {
-                if (checkNotificationsPermission(getContext(), true)) {
-                    go.setVisibility(View.INVISIBLE);
-                    pref.forceBool(Prefs.KEYS.NOTIFICATION_ALERTS.toString(), true);
-                }
-            });
-            return v;
-        }
-
-        @Override
-        public void onResume() {
-            super.onResume();
-            if (shouldEnableNotificationsAlerts && checkNotificationsPermission(getContext(), false)) {
-                go.setVisibility(View.INVISIBLE);
-                pref.forceBool(Prefs.KEYS.NOTIFICATION_ALERTS.toString(), true);
-            }
-        }
-
-        private boolean checkNotificationsPermission(Context c, boolean prompt) {
-            ContentResolver contentResolver = c.getContentResolver();
-            String enabledNotificationListeners = Settings.Secure.getString(contentResolver, "enabled_notification_listeners");
-            String packageName = c.getPackageName();
-
-            if (enabledNotificationListeners == null || !enabledNotificationListeners.contains(packageName)) {
-                if (Utils.isAndroidNewerThanL() && prompt) {
-                    Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    shouldEnableNotificationsAlerts = true;
-                } else if (prompt) {
-                    checkAndStartActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
-                    shouldEnableNotificationsAlerts = true;
-                }
-                Toast.makeText(getContext(), R.string.warning_9_allow_notification, Toast.LENGTH_LONG).show();
-                return false;
-            }
-            return true;
-        }
-
-        private void checkAndStartActivity(Intent intent) {
-            List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-            if (list.size() > 0)
-                startActivity(intent);
-        }
-    }
+//    public static class Fifth extends Fragment {
+//        private View v;
+//        private boolean shouldEnableNotificationsAlerts;
+//        private Button go;
+//
+//        @Nullable
+//        @Override
+//        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//            v = inflater.inflate(R.layout.intro_screen, container, false);
+//            v.findViewById(R.id.background).setBackgroundColor(Color.parseColor("#9c27b0"));
+//            ((TextView) v.findViewById(R.id.title)).setText(R.string.intro_notifications);
+//            ((TextView) v.findViewById(R.id.description)).setText(R.string.intro_notifications_desc);
+//            go = (Button) v.findViewById(R.id.go);
+//            go.setOnClickListener(view -> {
+//                if (checkNotificationsPermission(getContext(), true)) {
+//                    go.setVisibility(View.INVISIBLE);
+//                    pref.forceBool(Prefs.KEYS.NOTIFICATION_ALERTS.toString(), true);
+//                }
+//            });
+//            return v;
+//        }
+//
+//        @Override
+//        public void onResume() {
+//            super.onResume();
+//            if (shouldEnableNotificationsAlerts && checkNotificationsPermission(getContext(), false)) {
+//                go.setVisibility(View.INVISIBLE);
+//                pref.forceBool(Prefs.KEYS.NOTIFICATION_ALERTS.toString(), true);
+//            }
+//        }
+//
+//        private boolean checkNotificationsPermission(Context c, boolean prompt) {
+//            ContentResolver contentResolver = c.getContentResolver();
+//            String enabledNotificationListeners = Settings.Secure.getString(contentResolver, "enabled_notification_listeners");
+//            String packageName = c.getPackageName();
+//
+//            if (enabledNotificationListeners == null || !enabledNotificationListeners.contains(packageName)) {
+//                if (Utils.isAndroidNewerThanL() && prompt) {
+//                    Intent intent = new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    startActivity(intent);
+//                    shouldEnableNotificationsAlerts = true;
+//                } else if (prompt) {
+//                    checkAndStartActivity(new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"));
+//                    shouldEnableNotificationsAlerts = true;
+//                }
+//                Toast.makeText(getContext(), R.string.warning_9_allow_notification, Toast.LENGTH_LONG).show();
+//                return false;
+//            }
+//            return true;
+//        }
+//
+//        private void checkAndStartActivity(Intent intent) {
+//            List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+//            if (list.size() > 0)
+//                startActivity(intent);
+//        }
+//    }
 }
